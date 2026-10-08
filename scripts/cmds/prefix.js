@@ -1,4 +1,4 @@
-const moment = require("moment-timezone");
+cmd unload prefix.js const moment = require("moment-timezone");
 const axios = require("axios");
 
 const mediaList = [
@@ -36,6 +36,83 @@ async function getImgurStream(url) {
   }
 }
 
+async function sendPrefixInfo({ event, message }) {
+  const threadID = event.threadID;
+
+  const systemPrefix = global.GoatBot.config.prefix || "/";
+  const groupPrefix = (global.utils && typeof global.utils.getPrefix === "function") 
+    ? global.utils.getPrefix(threadID) 
+    : systemPrefix;
+
+  const timeRaw = moment().tz("Asia/Dhaka").format("hh:mm A");
+  const dateRaw = moment().tz("Asia/Dhaka").format("DD MMM YYYY");
+
+  const sysPrefixBold = toBoldFont(systemPrefix);
+  const grpPrefixBold = toBoldFont(groupPrefix);
+  const timeBold = toBoldFont(timeRaw);
+  const dateBold = toBoldFont(dateRaw);
+  const ownerBold = "𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍";
+  const totalCmdsBold = toBoldFont(global.GoatBot.commands ? global.GoatBot.commands.size : 0);
+
+  const design1 = `» 👑 𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍 👑
+───────────────
+⚙️ 𝐏𝐑𝐄𝐅𝐈𝐗
+╰─➤ ${sysPrefixBold}
+💬 𝐆𝐑𝐎𝐔𝐏
+╰─➤ ${grpPrefixBold}
+» 🕐 𝐓𝐈𝐌𝐄  › ${timeBold}
+» 📆 𝐃𝐀𝐓𝐄  › ${dateBold}
+» 👑 𝐎𝐖𝐍𝐄𝐑 › 
+» ⚛️ ${ownerBold}
+» ⚡ 𝐂𝐌𝐃𝐒  › ${totalCmdsBold}
+» ⚛️ 𝐕𝐄𝐑   › 𝐕𝟐 • 𝐕𝟑 • 𝐕𝟓
+» ✅ 𝐒𝐓𝐀𝐓𝐔𝐒 › 𝐀𝐂𝐓𝐈𝐕𝐄
+───────────────
+╭─ 🔗 𝐆𝐈𝐓𝐇𝐔𝐁 ─╮
+╰➤ [ https://github.com/siyamxpro/siyamxpro.git ]
+───────────────
+🧚‍♀️𝗡𝗜𝗝𝗛𝗨𝗠 𝗖𝗛𝗔𝗧𝗕𝗢𝗧`;
+
+  const design2 = `❖ ─ [ 𝐒𝐘𝐒𝐓𝐄𝐌 𝐈𝐍𝐅𝐎 ] ─ ❖
+
+⚡ 𝐏𝐑𝐄𝐅𝐈𝐗 : ➜ [ ${sysPrefixBold} ]
+💬 𝐆𝐑𝐎𝐔𝐏 : ── ❖ ${grpPrefixBold} ❖── 
+⏰ 𝐓𝐈𝐌𝐄 : ${timeBold}
+📅 𝐃𝐀𝐓𝐄 : ${dateBold}
+👑 𝐎𝐖𝐍𝐄𝐑 : 
+⚛️ ${ownerBold}
+📊 𝐓𝐎𝐓𝐀𝐋 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒 : ${totalCmdsBold}
+⚛️ 𝐕𝐄𝐑𝐒𝐈𝐎𝐍 : 𝐕𝟐 • 𝐕𝟑 • 𝐕𝟓
+✅ 𝐒𝐓𝐀𝐓𝐔𝐒 : 𝐀𝐂𝐓𝐈𝐕𝐄
+───────────────
+╭─ 🔗 𝐆𝐈𝐓𝐇𝐔𝐁 ─╮
+╰➤ [ https://github.com/siyamxpro/siyamxpro.git ]
+───────────────
+⚛️ 𝗡𝗜𝗝𝗛𝗨𝗠 𝗖𝗛𝗔𝗧𝗕𝗢𝗧`;
+
+  const designs = [design1, design2];
+  const randomDesign = designs[Math.floor(Math.random() * designs.length)];
+  const randomMediaURL = mediaList[Math.floor(Math.random() * mediaList.length)];
+
+  let mediaStream = await getImgurStream(randomMediaURL);
+
+  if (!mediaStream && global.utils && typeof global.utils.getStreamFromURL === "function") {
+    try {
+      mediaStream = await global.utils.getStreamFromURL(randomMediaURL);
+    } catch (e) {
+      mediaStream = null;
+    }
+  }
+
+  const msgPayload = {
+    body: randomDesign
+  };
+
+  if (mediaStream) msgPayload.attachment = mediaStream;
+
+  return message.reply(msgPayload);
+}
+
 module.exports = {
   config: {
     name: "prefix",
@@ -49,9 +126,9 @@ module.exports = {
 
   langs: {
     en: {
-      usage: "❌ 𝐔𝐬𝐚𝐠𝐞: 𝐩𝐫𝐞𝐟𝐢𝐱 <𝐧𝐞𝐰> | 𝐩𝐫𝐞𝐟𝐢𝐱 𝐫𝐞𝐬𝐞𝐭 | 𝐩𝐫𝐞𝐟𝐢𝐱 <𝐧𝐞𝐰> -𝐠",
+      usage: "আমার বস 👑 𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍 👑 সিয়াম ভাই আমাকে তৈরি করেছেন",
       reset: "✅ 𝐏𝐫𝐞𝐟𝐢𝐱 𝐑𝐞𝐬𝐞𝐭 𝐒𝐮𝐜𝐜𝐞𝐬𝐬!\n🔰 𝐒𝐲𝐬𝐭𝐞𝐦: %1",
-      onlyAdmin: "⛔ 𝐎𝐧𝐥𝐲 𝐁𝐨𝐭 𝐀𝐝𝐦𝐢𝐧 𝐂𝐚𝐧 𝐂𝐡𝐚𝐧𝐠𝐞 𝐆𝐥𝐨𝐛𝐚𝐥 𝐏𝐫𝐞𝐟𝐢𝐱.",
+      onlyAdmin: "⛔ 𝐎𝐧𝐥𝐲 𝐁𝐨𝐭 𝐀𝐝𝐦𝐢𝐧 𝐂𝐚𝐧 𝐂𝐡𝐚𝐧𝐠𝐞 𝐆𝐥𝐨𝐛𝐚𝐥 𝐏ρη𝐟𝐢𝐱.",
       confirmGlobal: "⚠️ 𝐆𝐥𝐨𝐛𝐚𝐥 𝐏𝐫𝐞𝐟𝐢𝐱 𝐂𝐡𝐚𝐧𝐠𝐞?\n👉 𝐑𝐞𝐚𝐜𝐭 𝐓𝐨 𝐂𝐨𝐧𝐟𝐢𝐫𝐦",
       confirmThisThread: "⚠️ 𝐆𝐫𝐨𝐮𝐩 𝐏𝐫𝐞𝐟𝐢𝐱 𝐂𝐡𝐚𝐧𝐠𝐞?\n👉 𝐑𝐞𝐚𝐜𝐭 𝐓𝐨 𝐂𝐨𝐧𝐟𝐢𝐫𝐦",
       successGlobal: "✅ 𝐆𝐋𝐎𝐁𝐀𝐋 𝐏𝐑𝐄𝐅𝐈𝐗 𝐂𝐇𝐀𝐍𝐆𝐄𝐃!\n🆕 %1",
@@ -61,7 +138,9 @@ module.exports = {
 
   onStart: async function ({ message, role, args, commandName, event, threadsData, getLang }) {
     try {
-      if (!args[0]) return message.reply(getLang("usage"));
+      if (!args[0]) {
+        return await sendPrefixInfo({ event, message });
+      }
 
       const threadID = event.threadID;
 
@@ -121,81 +200,7 @@ module.exports = {
   onChat: async function ({ event, message }) {
     try {
       if (!event.body || event.body.trim().toLowerCase() !== "prefix") return;
-
-      const threadID = event.threadID;
-
-      const systemPrefix = global.GoatBot.config.prefix || "/";
-      const groupPrefix = (global.utils && typeof global.utils.getPrefix === "function") 
-        ? global.utils.getPrefix(threadID) 
-        : systemPrefix;
-
-      const timeRaw = moment().tz("Asia/Dhaka").format("hh:mm A");
-      const dateRaw = moment().tz("Asia/Dhaka").format("DD MMM YYYY");
-
-      const sysPrefixBold = toBoldFont(systemPrefix);
-      const grpPrefixBold = toBoldFont(groupPrefix);
-      const timeBold = toBoldFont(timeRaw);
-      const dateBold = toBoldFont(dateRaw);
-      const ownerBold = "𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍";
-      const totalCmdsBold = toBoldFont(global.GoatBot.commands ? global.GoatBot.commands.size : 0);
-
-      const design1 = `» 👑 𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍 👑
-───────────────
-⚙️ 𝐏𝐑𝐄𝐅𝐈𝐗
-╰─➤ ${sysPrefixBold}
-💬 𝐆𝐑𝐎𝐔𝐏
-╰─➤ ${grpPrefixBold}
-» 🕐 𝐓𝐈𝐌𝐄  › ${timeBold}
-» 📆 𝐃𝐀𝐓𝐄  › ${dateBold}
-» 👑 𝐎𝐖𝐍𝐄𝐑 › 
-⚛️ ${ownerBold}
-» ⚡ 𝐂𝐌𝐃𝐒  › ${totalCmdsBold}
-» ⚛️ 𝐕𝐄𝐑   › 𝐕𝟐 • 𝐕𝟑 • 𝐕𝟓
-» ✅ 𝐒𝐓𝐀𝐓𝐔𝐒 › 𝐀𝐂𝐓𝐈𝐕𝐄
-───────────────
-╭─ 🔗 𝐆𝐈𝐓𝐇𝐔𝐁 ─╮
-╰➤ [ https://github.com/siyamxpro/siyamxpro.git ]
-───────────────
-🧚‍♀️𝗡𝗜𝗝𝗛𝗨𝗠 𝗖𝗛𝗔𝗧𝗕𝗢𝗧`;
-
-      const design2 = `❖ ─ [ 𝐒𝐘𝐒𝐓𝐄𝐌 𝐈𝐍𝐅𝐎 ] ─ ❖
-
-⚡ 𝐏𝐑𝐄𝐅𝐈𝐗 : ➜ [ ${sysPrefixBold} ]
-💬 𝐆𝐑𝐎𝐔𝐏 : ── ❖ ${grpPrefixBold} ❖── 
-⏰ 𝐓𝐈𝐌𝐄 : ${timeBold}
-📅 𝐃𝐀𝐓𝐄 : ${dateBold}
-👑 𝐎𝐖𝐍𝐄𝐑 : 
-⚛️ ${ownerBold}
-📊 𝐓𝐎𝐓𝐀𝐋 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒 : ${totalCmdsBold}
-⚛️ 𝐕𝐄𝐑𝐒𝐈𝐎𝐍 : 𝐕𝟐 • 𝐕𝟑 • 𝐕𝟓
-✅ 𝐒𝐓𝐀𝐓𝐔𝐒 : 𝐀𝐂𝐓𝐈𝐕𝐄
-───────────────
-╭─ 🔗 𝐆𝐈𝐓𝐇𝐔𝐁 ─╮
-╰➤ [ https://github.com/siyamxpro/siyamxpro.git ]
-───────────────
-⚛️ 𝐍𝐈𝐉𝐇𝐔𝐌 𝐂𝐇𝐀𝐓𝐁𝐎𝐓`;
-
-      const designs = [design1, design2];
-      const randomDesign = designs[Math.floor(Math.random() * designs.length)];
-      const randomMediaURL = mediaList[Math.floor(Math.random() * mediaList.length)];
-
-      let mediaStream = await getImgurStream(randomMediaURL);
-
-      if (!mediaStream && global.utils && typeof global.utils.getStreamFromURL === "function") {
-        try {
-          mediaStream = await global.utils.getStreamFromURL(randomMediaURL);
-        } catch (e) {
-          mediaStream = null;
-        }
-      }
-
-      const msgPayload = {
-        body: randomDesign
-      };
-
-      if (mediaStream) msgPayload.attachment = mediaStream;
-
-      return message.reply(msgPayload);
+      return await sendPrefixInfo({ event, message });
     } catch (err) {
       return message.reply(`❌ Prefix Error: ${err.message}`);
     }
