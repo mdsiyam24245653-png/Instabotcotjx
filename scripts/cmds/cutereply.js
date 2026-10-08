@@ -50,8 +50,8 @@ const TRIGGERS = [
 » 🤍 ধৈর্য ধরার জন্য ধন্যবাদ
 ───────────────
 » 👤 𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍
-» 📞 +8801789138157
-» 🔗 𝗙𝗔𝗖𝗘𝗕𝗢𝗢𝗞: https://www.facebook.com/profile.php?id=61592677587804`,
+» 📞 +8801608-279461
+» 🔗 𝗙𝗔𝗖𝗘𝗕𝗢𝗢𝗞: https://www.facebook.com/profile.php?id=61594826054131`,
     images: [
       "https://i.imgur.com/XDj7Lg3.jpeg",
       "https://i.imgur.com/vPTaRaf.jpeg",
@@ -77,8 +77,8 @@ const TRIGGERS = [
 ───────────────
 » 👑 𝗢𝗪𝗡𝗘𝗥: 𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍
 
-» 📞 𝗖𝗢𝗡𝗧𝗔𝗖𝗧: +8801789138157
-» 🔗 𝗙𝗔𝗖𝗘𝗕𝗢𝗢𝗞: https://www.facebook.com/profile.php?id=61592677587804`,
+» 📞 𝗖𝗢𝗡𝗧𝗔𝗖𝗧:  +8801608279461
+» 🔗 𝗙𝗔𝗖𝗘𝗕𝗢𝗢𝗞: https://www.facebook.com/profile.php?id=61594826054131`,
     images: [
       "https://i.imgur.com/rkrXNso.jpeg",
       "https://i.imgur.com/wyNCOKV.gif"
