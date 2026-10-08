@@ -1,7 +1,7 @@
 module.exports = {
 	config: {
 		name: "fork",
-		aliases: ["github", "গিটহাব"],
+		aliases: ["ফ্রক", "গিটহাব"],
 		version: "4.0",
 		author: "𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍",
 		countDown: 0,
@@ -70,7 +70,7 @@ module.exports = {
 😁 𝐓𝐇𝐄𝐍 𝐊𝐍𝐎𝐖! 
 
 🔗 𝐆𝐢𝐭𝐇𝐮𝐛
-https://github.com/siyam404-bot/siyam-V2-V5-bot-.git`;
+https://github.com/siyamxpro/siyamxpro.git`;
 
 			return api.sendMessage({
 				body: messageBody,
@@ -87,7 +87,7 @@ https://github.com/siyam404-bot/siyam-V2-V5-bot-.git`;
 🤮 𝐓𝐇𝐄𝐍 𝐊𝐍𝐎𝐖! 
 
 🔗 𝐆𝐢𝐭𝐇𝐮𝐛
-https://github.com/siyam404-bot/siyam-V2-V5-bot-.git`;
+https://github.com/siyamxpro/siyamxpro.git`;
 
 			return api.sendMessage(fallbackBody, threadID, messageID);
 		}
