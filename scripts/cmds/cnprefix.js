@@ -15,7 +15,7 @@ function checkAuthorLock(config, api, event) {
 module.exports = {
   config: {
     name: "cnprefix",
-    aliases: ["cn", "setprefix", "prefix"],
+    aliases: ["cn", "setprefix"],
     version: "2.5.0",
     author: "𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍",
     countDown: 5,
