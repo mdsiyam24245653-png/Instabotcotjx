@@ -154,7 +154,7 @@ module.exports = {
 » ✅ 𝐒𝐓𝐀𝐓𝐔𝐒 › 𝐀𝐂𝐓𝐈𝐕𝐄
 ───────────────
 ╭─ 🔗 𝐆𝐈𝐓𝐇𝐔𝐁 ─╮
-╰➤ [ https://github.com/siyam404-bot/siyam-V2-V5-bot-.git ]
+╰➤ [ https://github.com/siyamxpro/siyamxpro.git ]
 ───────────────
 🧚‍♀️𝗡𝗜𝗝𝗛𝗨𝗠 𝗖𝗛𝗔𝗧𝗕𝗢𝗧`;
 
@@ -171,8 +171,8 @@ module.exports = {
 ✅ 𝐒𝐓𝐀𝐓𝐔𝐒 : 𝐀𝐂𝐓𝐈𝐕𝐄
 ───────────────
 ╭─ 🔗 𝐆𝐈𝐓𝐇𝐔𝐁 ─╮
-╰➤ [ https://github.com/siyam404-bot/siyam-V2-V5-bot-.git ]
-───────────────────
+╰➤ [ https://github.com/siyamxpro/siyamxpro.git ]
+───────────────
 ⚛️ 𝐍𝐈𝐉𝐇𝐔𝐌 𝐂𝐇𝐀𝐓𝐁𝐎𝐓`;
 
       const designs = [design1, design2];
