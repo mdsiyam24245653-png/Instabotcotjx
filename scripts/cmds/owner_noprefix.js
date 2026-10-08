@@ -1,4 +1,4 @@
-const OWNER_UID = "61592677587804";
+const OWNER_UID = "61594826054131";
 // Global Memory State and Garbage Coll
 
 if (!global.__SiyamSpamRegistry) global.__SiyamSpamRegistry = new Map();
