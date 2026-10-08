@@ -2,18 +2,13 @@ const axios = require("axios");
 const fs = require("fs-extra");
 const path = require("path");
 
-const _x1 = "𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍";
-const _x2 = "SIYAM_HASAN";
-
-const __lock = (() => {
-  const a = ["𝆠", "፝", "𝐒", "𝐈", "𝐘", "𝐀", "𝐌"];
-  return a.join("");
-})();
-
+// ডিফল্টভাবে ভয়েস সিস্টেম অফ থাকবে
 global.SiyamVoiceStatus = false;
 
+const cooldowns = new Map();
+const COOLDOWN_TIME = 3 * 60 * 1000;
+
 const cacheDir = path.join(__dirname, "cache", "voices");
-const rotationFile = path.join(__dirname, "cache", "salam_rotation.json");
 
 setInterval(() => {
   try {
@@ -45,52 +40,49 @@ setInterval(() => {
 module.exports = {
   config: {
     name: "text_voice",
-    version: "4.0.0",
-    author: _x2,
+    version: "4.4.0",
+    author: "SIYAM_HASAN",
     countDown: 1,
     role: 0,
     shortDescription: "Voice system",
-    longDescription: "Voice system",
+    longDescription: "Voice system with admin ON/OFF control & 3-min cooldown for general users",
     category: "system"
-  },
-
-  _s() {
-    if (!_x1.includes(__lock)) {  
-      throw new Error("SYSTEM LOCKED");  
-    }  
-    if (module.exports.config.author !== _x2) {  
-      throw new Error("AUTHOR CHANGE DETECTED");  
-    }  
   },
 
   onStart: async function () {},
 
   onChat: async function ({ event, message }) {
-    this._s();  
     if (!event.body) return;  
 
     const botID = String(global.GoatBot?.config?.botID || (typeof api !== 'undefined' ? api.getCurrentUserID() : "")); 
     const senderID = String(event.senderID);
     if (senderID === botID || senderID === "0") return;
 
+    const input = event.body.toLowerCase().replace(/\s+/g, " ").trim();  
+
     const admins = (global.GoatBot?.config?.adminBot || []).map(id => String(id));
     const isAdmin = admins.includes(senderID);
 
-    if (!isAdmin) return;
+    // কেবল অ্যাডমিনরা ভয়েস সিস্টেম অন বা অফ করতে পারবে
+    if (isAdmin) {
+      if (input === "voice on") {
+        global.SiyamVoiceStatus = true;
+        return message.reply("Voice system activated successfully.");
+      }
 
-    const input = event.body.toLowerCase().replace(/\s+/g, " ").trim();  
-
-    if (input === "voice on") {
-      global.SiyamVoiceStatus = true;
-      return message.reply("Voice system activated successfully.");
+      if (input === "voice off") {
+        global.SiyamVoiceStatus = false;
+        return message.reply("Voice system deactivated.");
+      }
     }
 
-    if (input === "voice off") {
-      global.SiyamVoiceStatus = false;
-      return message.reply("Voice system deactivated.");
-    }
-
+    // ভয়েস সিস্টেম অফ থাকলে আর কাজ করবে না
     if (!global.SiyamVoiceStatus) return;
+
+    const threadID = event.threadID;
+    const currentPrefix = (global.utils && typeof global.utils.getPrefix === "function") 
+      ? global.utils.getPrefix(threadID) 
+      : (global.GoatBot?.config?.prefix || "/");
 
     const badWordsMap = {
       "ভুদা": "https://files.catbox.moe/gnyx0p.mp3",  
@@ -98,24 +90,17 @@ module.exports = {
       "🖕": "https://files.catbox.moe/n4kdj7.mp3"
     };
 
+    const prefixSex = `${currentPrefix}sex`.toLowerCase();
+    const prefixHot = `${currentPrefix}hot`.toLowerCase();
+
     const exactMatchMap = {  
-      "good night": "https://files.catbox.moe/i29m4q.mp3",  
-      "গুড নাইট": "https://files.catbox.moe/i29m4q.mp3",  
-      "good morning": "https://files.catbox.moe/8gzqx5.mp3",  
-      "গুড মর্নিং": "https://files.catbox.moe/8gzqx5.mp3",  
-      "siyam": "https://files.catbox.moe/9w6moo.mp3",  
-      "সিয়াম ভাই": "https://files.catbox.moe/9w6moo.mp3",  
-      "সিয়াম": "https://files.catbox.moe/9w6moo.mp3",  
       "@তা্ঁনি্ঁশা্ঁর্ঁ' জা্ঁমা্ঁই্ঁ' সি্ঁয়া্ঁম্ঁ": "https://files.catbox.moe/lkysl2.mp4",  
-      "@everyone": "https://files.catbox.moe/stcply.mp3",  
-      "নিঝুম": "https://files.catbox.moe/3u6shs.mp3",  
-      ",sex": "https://files.catbox.moe/uy7mrv.mp3",  
-      ",hot": "https://files.catbox.moe/m5djca.mp3",  
+      [prefixSex]: "https://files.catbox.moe/uy7mrv.mp3",  
+      [prefixHot]: "https://files.catbox.moe/m5djca.mp3",  
       "s+n": "https://files.catbox.moe/841gpc.mp4",  
       "টুকি": "https://files.catbox.moe/e8ebel.mp3",  
       "@RJ siyam": "https://files.catbox.moe/9w6moo.mp3",  
       "নুনু": "https://files.catbox.moe/r5uz42.mp3",  
-      "👍": "https://files.catbox.moe/ahux2o.mp4",  
       "✡️": "https://files.catbox.moe/5rdtc6.mp3",  
       "মিম তুমারে চুদি": "https://files.catbox.moe/plex4g.mp4",  
       "কপি বট": "https://files.catbox.moe/4vmyke.mp4"
@@ -133,7 +118,7 @@ module.exports = {
       const badWordsList = Object.keys(badWordsMap);
       const exactMatchList = Object.keys(exactMatchMap);
       const multiVoiceList = Object.keys(multiVoiceMap);
-      const totalVoices = badWordsList.length + exactMatchList.length + multiVoiceList.length + 6;
+      const totalVoices = badWordsList.length + exactMatchList.length + multiVoiceList.length + 3;
 
       let serial = 1;
       let msg = `🛡️ ［ 𝗩𝗢𝗜𝗖𝗘 𝗛𝗘𝗟𝗣 🛡️\n\n🔋────🛡️────🪫\n\n`;
@@ -143,12 +128,9 @@ module.exports = {
       msg += `├── ${serial++}. Smart Filter\n`;
       msg += `├── ${serial++}. bishwas\n`;
       msg += `├── ${serial++}. bye\n`;
-      msg += `├── ${serial++}. গোলাপ / হাই\n`;
 
       msg += `├── 🎵 [ EXACT MATCH ]\n`;
       exactMatchList.forEach(trigger => msg += `├── ${serial++}. ${trigger}\n`);
-      msg += `├── ${serial++}. assalamualaikum\n`;
-      msg += `├── ${serial++}. Haha Filter\n`;
 
       msg += `├── 💖 [ MULTI-VOICE ]\n`;
       multiVoiceList.forEach(trigger => msg += `├── ${serial++}. ${trigger}\n`);
@@ -157,7 +139,7 @@ module.exports = {
       msg += `🤖 𝗕𝗢𝗧: 𝗡𝗜𝗝𝗛𝗨𝗠 𝗕𝗢𝗧\n`;
       msg += `👑 𝗢𝗪𝗡𝗘𝗥: 𝗦𝗜𝗬𝗔𝗠 𝗛𝗔𝗦𝗔𝗡\n`;
       msg += `📊 𝗧𝗢𝗧𝗔𝗟 𝗩𝗢𝗜𝗖𝗘𝗦: ${totalVoices}\n\n`;
-      msg += `📱 Contact: +8801789138157`;
+      msg += `📱 Contact: +8801608279461`;
 
       return message.reply(msg);  
     }  
@@ -177,41 +159,9 @@ module.exports = {
       matchedTrigger = "bishwas_global_filter";
     }
 
-    if (!targetAudioUrl && (input.includes("বাই") || input.includes("bye"))) {
+    if (!targetAudioUrl && (input.includes("ততণ🙋-_😘&গত") || input.includes("bye"))) {
       targetAudioUrl = "https://files.catbox.moe/fdqh2m.mp3";
       matchedTrigger = "bye_global_filter";
-    }
-
-    if (!targetAudioUrl && (input === "গোলাপ" || input === "হাই")) {
-      targetAudioUrl = "https://files.catbox.moe/bo0o5e.mp3";
-      matchedTrigger = "hi_golap_exact_filter";
-    }
-
-    if (!targetAudioUrl && (input.includes("আসসালামু আলাইকুম") || input.includes("assalamualaikum"))) {
-      const salamLinks = [
-        "https://files.catbox.moe/tx1keh.mp4",
-        "https://files.catbox.moe/crjins.mp4"
-      ];
-      let index = 0;
-      try {
-        if (fs.existsSync(rotationFile)) {
-          const rData = fs.readJsonSync(rotationFile);
-          index = rData.index || 0;
-        }
-      } catch(e) {}
-      
-      targetAudioUrl = salamLinks[index];
-      matchedTrigger = `salam_rotation_${index}`;
-      
-      try {
-        fs.ensureDirSync(path.dirname(rotationFile));
-        fs.writeJsonSync(rotationFile, { index: (index + 1) % salamLinks.length });
-      } catch(e) {}
-    }
-
-    if (!targetAudioUrl && (input.includes("haha") || /😹|😸|🧛|🧟/.test(input))) {
-      targetAudioUrl = "https://files.catbox.moe/5jsh3v.mp4";
-      matchedTrigger = "haha_emoji_filter";
     }
 
     if (!targetAudioUrl) {
@@ -229,12 +179,27 @@ module.exports = {
       matchedTrigger = input;
     }
 
-    if (!targetAudioUrl && multiVoiceMap[input]) {
-      targetAudioUrl = multiVoiceMap[input];
-      matchedTrigger = input;
+    if (!targetAudioUrl) {
+      for (const key in multiVoiceMap) {
+        if (input.includes(key)) {
+          targetAudioUrl = multiVoiceMap[key];
+          matchedTrigger = key;
+          break;
+        }
+      }
     }
 
     if (targetAudioUrl) {
+      const currentTime = Date.now();
+
+      if (!isAdmin) {
+        const lastTriggerTime = cooldowns.get(senderID);
+        if (lastTriggerTime && (currentTime - lastTriggerTime < COOLDOWN_TIME)) {
+          return; 
+        }
+        cooldowns.set(senderID, currentTime);
+      }
+
       fs.ensureDirSync(cacheDir);  
       
       const ext = ".mp3";  
