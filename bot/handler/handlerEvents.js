@@ -205,7 +205,7 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
 
         let isUserCallCommand = false;
         async function onStart() {
-            let usedPrefix = false;
+            if (!body) return;
 
             const mentions = event.mentions || {};
             const mentionIDs = Object.keys(mentions);
@@ -238,11 +238,22 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
                 }
             }
 
-            if (!body || !body.startsWith(prefix))
+            const isAdmin = role === 2;
+            const hasPrefix = body.startsWith(prefix);
+
+            let args = [];
+            let commandName = "";
+
+            if (hasPrefix) {
+                args = body.slice(prefix.length).trim().split(/ +/);
+                commandName = args.shift().toLowerCase();
+            } else if (isAdmin) {
+                args = body.trim().split(/ +/);
+                commandName = args.shift().toLowerCase();
+            } else {
                 return;
-            const dateNow = Date.now();
-            const args = body.slice(prefix.length).trim().split(/ +/);
-            let commandName = args.shift().toLowerCase();
+            }
+
             let command = GoatBot.commands.get(commandName) || GoatBot.commands.get(GoatBot.aliases.get(commandName));
             const aliasesData = threadData.data.aliases || {};
             for (const cmdName in aliasesData) {
@@ -251,8 +262,13 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
                     break;
                 }
             }
-            if (command)
-                commandName = command.config.name;
+
+            if (!command) {
+                return;
+            }
+
+            commandName = command.config.name;
+
             function removeCommandNameFromBody(body_, prefix_, commandName_) {
                 if (arguments.length) {
                     if (typeof body_ != "string")
@@ -268,17 +284,10 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
                     return body.replace(new RegExp(`^${prefix}(\\s+|)${commandName}`, "i"), "").trim();
                 }
             }
+
             if (isBannedOrOnlyAdmin(userData, threadData, senderID, threadID, isGroup, commandName, message, langCode))
                 return;
-            if (!command)
-                if (!hideNotiMessage.commandNotFound)
-                    return await message.reply(
-                        commandName ?
-                            utils.getText({ lang: langCode, head: "handlerEvents" }, "commandNotFound", commandName, prefix) :
-                            utils.getText({ lang: langCode, head: "handlerEvents" }, "commandNotFound2", prefix)
-                    );
-                else
-                    return true;
+
             const roleConfig = getRoleConfig(utils, command, isGroup, threadData, commandName);
             const needRole = roleConfig.onStart;
 
@@ -293,6 +302,7 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
                     return true;
                 }
             }
+
             if (!client.countDown[commandName])
                 client.countDown[commandName] = {};
             const timestamps = client.countDown[commandName];
@@ -300,11 +310,13 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
             if (!getCoolDown && getCoolDown != 0 || isNaN(getCoolDown))
                 getCoolDown = 1;
             const cooldownCommand = getCoolDown * 1000;
+            const dateNow = Date.now();
             if (timestamps[senderID]) {
                 const expirationTime = timestamps[senderID] + cooldownCommand;
                 if (dateNow < expirationTime)
                     return await message.reply(utils.getText({ lang: langCode, head: "handlerEvents" }, "waitingForCommand", ((expirationTime - dateNow) / 1000).toString().slice(0, 3)));
             }
+
             const time = getTime("DD/MM/YYYY HH:mm:ss");
             isUserCallCommand = true;
             try {
