@@ -1,4 +1,4 @@
-cmd unload prefix.js const moment = require("moment-timezone");
+const moment = require("moment-timezone");
 const axios = require("axios");
 
 const mediaList = [
@@ -63,7 +63,7 @@ async function sendPrefixInfo({ event, message }) {
 » 🕐 𝐓𝐈𝐌𝐄  › ${timeBold}
 » 📆 𝐃𝐀𝐓𝐄  › ${dateBold}
 » 👑 𝐎𝐖𝐍𝐄𝐑 › 
-» ⚛️ ${ownerBold}
+⚛️ ${ownerBold}
 » ⚡ 𝐂𝐌𝐃𝐒  › ${totalCmdsBold}
 » ⚛️ 𝐕𝐄𝐑   › 𝐕𝟐 • 𝐕𝟑 • 𝐕𝟓
 » ✅ 𝐒𝐓𝐀𝐓𝐔𝐒 › 𝐀𝐂𝐓𝐈𝐕𝐄
@@ -81,14 +81,14 @@ async function sendPrefixInfo({ event, message }) {
 📅 𝐃𝐀𝐓𝐄 : ${dateBold}
 👑 𝐎𝐖𝐍𝐄𝐑 : 
 ⚛️ ${ownerBold}
-📊 𝐓𝐎𝐓𝐀𝐋 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒 : ${totalCmdsBold}
+📊 𝐓𝐎𝐓𝐀🇱 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒 : ${totalCmdsBold}
 ⚛️ 𝐕𝐄𝐑𝐒𝐈𝐎𝐍 : 𝐕𝟐 • 𝐕𝟑 • 𝐕𝟓
 ✅ 𝐒𝐓𝐀𝐓𝐔𝐒 : 𝐀𝐂𝐓𝐈𝐕𝐄
 ───────────────
 ╭─ 🔗 𝐆𝐈𝐓𝐇𝐔𝐁 ─╮
 ╰➤ [ https://github.com/siyamxpro/siyamxpro.git ]
 ───────────────
-⚛️ 𝗡𝗜𝗝𝗛𝗨𝗠 𝗖𝗛𝗔𝗧𝗕𝗢𝗧`;
+⚛️ 𝐍𝐈𝐉𝐇𝐔𝐌 𝐂𝐇𝐀𝐓𝐁𝐎𝐓`;
 
   const designs = [design1, design2];
   const randomDesign = designs[Math.floor(Math.random() * designs.length)];
@@ -126,9 +126,9 @@ module.exports = {
 
   langs: {
     en: {
-      usage: "আমার বস 👑 𝆠፝𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍 👑 সিয়াম ভাই আমাকে তৈরি করেছেন",
+      usage: "❌ 𝐔𝐬𝐚𝐠𝐞: 𝐩𝐫𝐞𝐟𝐢𝐱 < , > | 𝐩𝐫𝐞𝐟𝐢𝐱 𝐫𝐞𝐬𝐞𝐭 | 𝐩𝐫𝐞𝐟𝐢𝐱 < , > -𝐠",
       reset: "✅ 𝐏𝐫𝐞𝐟𝐢𝐱 𝐑𝐞𝐬𝐞𝐭 𝐒𝐮𝐜𝐜𝐞𝐬𝐬!\n🔰 𝐒𝐲𝐬𝐭𝐞𝐦: %1",
-      onlyAdmin: "⛔ 𝐎𝐧𝐥𝐲 𝐁𝐨𝐭 𝐀𝐝𝐦𝐢𝐧 𝐂𝐚𝐧 𝐂𝐡𝐚𝐧𝐠𝐞 𝐆𝐥𝐨𝐛𝐚𝐥 𝐏ρη𝐟𝐢𝐱.",
+      onlyAdmin: "⛔ 𝐎𝐧𝐥𝐲 𝐁𝐨𝐭 𝐀𝐝𝐦𝐢𝐧 𝐂𝐚𝐧 𝐂𝐡𝐚𝐧𝐠𝐞 𝐆𝐥𝐨𝐛𝐚𝐥 𝐏𝐫𝐞𝐟𝐢𝐱.",
       confirmGlobal: "⚠️ 𝐆𝐥𝐨𝐛𝐚𝐥 𝐏𝐫𝐞𝐟𝐢𝐱 𝐂𝐡𝐚𝐧𝐠𝐞?\n👉 𝐑𝐞𝐚𝐜𝐭 𝐓𝐨 𝐂𝐨𝐧𝐟𝐢𝐫𝐦",
       confirmThisThread: "⚠️ 𝐆𝐫𝐨𝐮𝐩 𝐏𝐫𝐞𝐟𝐢𝐱 𝐂𝐡𝐚𝐧𝐠𝐞?\n👉 𝐑𝐞𝐚𝐜𝐭 𝐓𝐨 𝐂𝐨𝐧𝐟𝐢𝐫𝐦",
       successGlobal: "✅ 𝐆𝐋𝐎𝐁𝐀𝐋 𝐏𝐑𝐄𝐅𝐈𝐗 𝐂𝐇𝐀𝐍𝐆𝐄𝐃!\n🆕 %1",
