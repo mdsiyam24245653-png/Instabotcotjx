@@ -241,6 +241,11 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
             const isAdmin = role === 2;
             const hasPrefix = body.startsWith(prefix);
 
+            // 📍 ১. শুধু প্রিফিক্স দিলে রেসপন্স করার ফিক্স
+            if (body.trim() === prefix) {
+                return await message.reply(utils.getText({ lang: langCode, head: "handlerEvents" }, "commandNotFound2", prefix));
+            }
+
             let args = [];
             let commandName = "";
 
@@ -263,7 +268,15 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
                 }
             }
 
+            // 📍 ২. ভুল কমান্ড দিলে মেসেজ পাঠানোর ফিক্স
             if (!command) {
+                if (hasPrefix && !hideNotiMessage.commandNotFound) {
+                    return await message.reply(
+                        commandName ?
+                            utils.getText({ lang: langCode, head: "handlerEvents" }, "commandNotFound", commandName, prefix) :
+                            utils.getText({ lang: langCode, head: "handlerEvents" }, "commandNotFound2", prefix)
+                    );
+                }
                 return;
             }
 
