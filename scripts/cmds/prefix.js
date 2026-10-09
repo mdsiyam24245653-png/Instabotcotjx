@@ -63,7 +63,7 @@ async function sendPrefixInfo({ event, message }) {
 » 🕐 𝐓𝐈𝐌𝐄  › ${timeBold}
 » 📆 𝐃𝐀𝐓𝐄  › ${dateBold}
 » 👑 𝐎𝐖𝐍𝐄𝐑 › 
-⚛️ ${ownerBold}
+» ⚛️ ${ownerBold}
 » ⚡ 𝐂𝐌𝐃𝐒  › ${totalCmdsBold}
 » ⚛️ 𝐕𝐄𝐑   › 𝐕𝟐 • 𝐕𝟑 • 𝐕𝟓
 » ✅ 𝐒𝐓𝐀𝐓𝐔𝐒 › 𝐀𝐂𝐓𝐈𝐕𝐄
@@ -116,7 +116,7 @@ async function sendPrefixInfo({ event, message }) {
 module.exports = {
   config: {
     name: "prefix",
-    version: "3.2",
+    version: "3.3",
     author: "𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍",
     countDown: 5,
     role: 0,
@@ -126,7 +126,7 @@ module.exports = {
 
   langs: {
     en: {
-      usage: "❌ 𝐔𝐬𝐚𝐠𝐞: 𝐩𝐫𝐞𝐟𝐢𝐱 < , > | 𝐩𝐫𝐞𝐟𝐢𝐱 𝐫𝐞𝐬𝐞𝐭 | 𝐩𝐫𝐞𝐟𝐢𝐱 < , > -𝐠",
+      usage: "❌ 𝐔𝐬𝐚𝐠𝐞: 𝐩𝐫𝐞𝐟𝐢𝐱 < > | 𝐩𝐫𝐞𝐟𝐢𝐱 𝐫𝐞𝐬𝐞𝐭 | 𝐩𝐫𝐞𝐟𝐢𝐱 <  > -𝐠",
       reset: "✅ 𝐏𝐫𝐞𝐟𝐢𝐱 𝐑𝐞𝐬𝐞𝐭 𝐒𝐮𝐜𝐜𝐞𝐬𝐬!\n🔰 𝐒𝐲𝐬𝐭𝐞𝐦: %1",
       onlyAdmin: "⛔ 𝐎𝐧𝐥𝐲 𝐁𝐨𝐭 𝐀𝐝𝐦𝐢𝐧 𝐂𝐚𝐧 𝐂𝐡𝐚𝐧𝐠𝐞 𝐆𝐥𝐨𝐛𝐚𝐥 𝐏𝐫𝐞𝐟𝐢𝐱.",
       confirmGlobal: "⚠️ 𝐆𝐥𝐨𝐛𝐚𝐥 𝐏𝐫𝐞𝐟𝐢𝐱 𝐂𝐡𝐚𝐧𝐠𝐞?\n👉 𝐑𝐞𝐚𝐜𝐭 𝐓𝐨 𝐂𝐨𝐧𝐟𝐢𝐫𝐦",
@@ -194,15 +194,6 @@ module.exports = {
       return message.reply(getLang("successThisThread", Reaction.newPrefix));
     } catch (error) {
       return message.reply(`❌ Reaction Error: ${error.message}`);
-    }
-  },
-
-  onChat: async function ({ event, message }) {
-    try {
-      if (!event.body || event.body.trim().toLowerCase() !== "prefix") return;
-      return await sendPrefixInfo({ event, message });
-    } catch (err) {
-      return message.reply(`❌ Prefix Error: ${err.message}`);
     }
   }
 };
