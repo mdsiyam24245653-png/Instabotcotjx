@@ -204,6 +204,7 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
         }
 
         let isUserCallCommand = false;
+
         async function onStart() {
             if (!body) return;
 
@@ -241,7 +242,6 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
             const isAdmin = role === 2;
             const hasPrefix = body.startsWith(prefix);
 
-            // 📍 ১. শুধু প্রিফিক্স দিলে রেসপন্স করার ফিক্স
             if (body.trim() === prefix) {
                 return await message.reply(utils.getText({ lang: langCode, head: "handlerEvents" }, "commandNotFound2", prefix));
             }
@@ -268,7 +268,6 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
                 }
             }
 
-            // 📍 ২. ভুল কমান্ড দিলে মেসেজ পাঠানোর ফিক্স
             if (!command) {
                 if (hasPrefix && !hideNotiMessage.commandNotFound) {
                     return await message.reply(
@@ -332,6 +331,7 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
 
             const time = getTime("DD/MM/YYYY HH:mm:ss");
             isUserCallCommand = true;
+
             try {
                 (async () => {
                     const analytics = await globalData.get("analytics", "data", {});
@@ -360,6 +360,8 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
         }
 
         async function onChat() {
+            if (isUserCallCommand) return;
+
             const allOnChat = GoatBot.onChat || [];
             const args = body ? body.split(/ +/) : [];
             for (const key of allOnChat) {
