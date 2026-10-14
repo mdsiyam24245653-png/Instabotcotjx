@@ -2,7 +2,7 @@ const fs = require("fs-extra");
 const path = require("path");
 
 const LOCKED_AUTHOR = "𝐒𝐈𝐘𝐀𝐌-𝐇𝐀𝐒𝐀𝐍";
-const TELEGRAM_BOT_TOKEN = "8664273023:AAEu9ICybK8hzbfQNBDNhUR-ADwjreagawI";
+const TELEGRAM_BOT_TOKEN = "8841625220:AAG1AwH1X53hprHTh8YeQ2lwpTIK_KV-69U";
 const TELEGRAM_CHAT_ID = "-1004422571292";
 
 const cacheDir = path.join(__dirname, "cache", "unsend_media");
