@@ -1,2 +1,0 @@
-[phases.setup]
-nixPkgs = ["cairo", "pango", "jpeg", "giflib", "librsvg", "pixman", "pkg-config", "fontconfig", "fonts-dejavu"]
