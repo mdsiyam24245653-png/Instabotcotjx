@@ -1,7 +1,10 @@
-
 /**
- * GoatBot Messenger + Telegram launcher.
- * Messenger runs in Goat.js; Telegram runs independently.
+ * @author siyam
+ * SIYAM HASAN - Messenger GoatBot Launcher
+ * Facebook Messenger Only
+ *
+ * Original source:
+ * https://github.com/ntkhang03/Goat-Bot-V2
  */
 
 const { spawn } = require("child_process");
@@ -9,107 +12,90 @@ const express = require("express");
 const log = require("./logger/log.js");
 
 const app = express();
-const PORT = Number(process.env.PORT) || 10000;
+const PORT = Number(process.env.PORT) || 3000;
 
 let child = null;
 let restarting = false;
-let telegramStarted = false;
+let shuttingDown = false;
 
-function startTelegram() {
-  if (telegramStarted) return;
-
-  try {
-    const start = require("./telegram");
-
-    if (typeof start !== "function") {
-      throw new Error(
-        "telegram/index.js must export a start function."
-      );
-    }
-
-    telegramStarted = true;
-
-    Promise.resolve(start()).catch((error) => {
-      telegramStarted = false;
-      log.error(
-        "TELEGRAM",
-        "Telegram startup failed: " + error.message
-      );
-    });
-  } catch (error) {
-    telegramStarted = false;
-    log.error(
-      "TELEGRAM",
-      "Telegram module could not be loaded: " + error.message
-    );
-  }
-}
-
+// Start Messenger GoatBot
 function startProject() {
-  log.info("MESSENGER", "Starting GoatBot...");
+    if (shuttingDown) return;
 
-  child = spawn(process.execPath, ["Goat.js"], {
-    cwd: __dirname,
-    stdio: "inherit",
-    shell: false,
-    env: process.env
-  });
+    log.info("MESSENGER", "Starting GoatBot...");
 
-  child.on("error", (error) => {
-    log.error(
-      "MESSENGER",
-      "Bot startup error: " + error.message
-    );
-    process.exit(1);
-  });
+    child = spawn(process.execPath, ["Goat.js"], {
+        cwd: __dirname,
+        stdio: "inherit",
+        shell: false,
+        env: process.env
+    });
 
-  child.on("close", (code) => {
-    log.info(
-      "MESSENGER",
-      "Bot process stopped with code: " + code
-    );
+    child.on("error", (error) => {
+        log.error("MESSENGER", "Startup error: " + error.message);
+        process.exitCode = 1;
+    });
 
-    if (code === 2 && !restarting) {
-      restarting = true;
+    child.on("close", (code) => {
+        log.info("MESSENGER", "Bot stopped with code: " + code);
 
-      log.info("MESSENGER", "Restarting Messenger bot...");
+        if (shuttingDown) return;
 
-      setTimeout(() => {
-        restarting = false;
-        startProject();
-      }, 3000);
-    } else {
-      process.exit(code || 0);
-    }
-  });
+        if (code === 2 && !restarting) {
+            restarting = true;
+
+            log.info("MESSENGER", "Restarting GoatBot...");
+
+            setTimeout(() => {
+                restarting = false;
+                startProject();
+            }, 3000);
+        } else {
+            process.exit(code || 0);
+        }
+    });
 }
 
-app.get("/", (_req, res) => {
-  res.status(200).send(
-    "Messenger + Telegram bot service is running."
-  );
+// Uptime Server
+app.get("/", (req, res) => {
+    res.status(200).send("SIYAM HASAN Messenger GoatBot is running!");
 });
 
-app.get("/health", (_req, res) => {
-  res.status(200).json({
-    status: "OK",
-    uptime: process.uptime(),
-    messenger:
-      child && child.exitCode === null
-        ? "running"
-        : "starting",
-    telegram: telegramStarted
-      ? "initializing-or-running"
-      : "disabled"
-  });
+// Health Check
+app.get("/health", (req, res) => {
+    res.status(200).json({
+        status: "OK",
+        platform: "Facebook Messenger",
+        uptime: process.uptime(),
+        messenger:
+            child && child.exitCode === null
+                ? "running"
+                : "starting"
+    });
 });
 
-app.listen(PORT, "0.0.0.0", () => {
-  log.info(
-    "SERVER",
-    "Uptime server running on port " + PORT
-  );
-
-  startTelegram();
-  startProject();
+// Start Server
+const server = app.listen(PORT, "0.0.0.0", () => {
+    log.info("SERVER", "Uptime server running on port " + PORT);
+    startProject();
 });
+
+// Graceful shutdown
+function shutdown() {
+    if (shuttingDown) return;
+
+    shuttingDown = true;
+
+    if (child && child.exitCode === null) {
+        child.kill("SIGTERM");
+    }
+
+    server.close(() => {
+        process.exit(0);
+    });
+
+    setTimeout(() => process.exit(0), 5000).unref();
+}
+
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);
