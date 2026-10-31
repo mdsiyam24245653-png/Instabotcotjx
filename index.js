@@ -1,3 +1,4 @@
+
 /**
  * @author siyam
  * SIYAM HASAN - Messenger GoatBot Launcher
@@ -6,6 +7,19 @@
  * Original source:
  * https://github.com/ntkhang03/Goat-Bot-V2
  */
+
+// Terminal compatibility fix
+for (const stream of [process.stdout, process.stderr]) {
+    if (stream) {
+        if (typeof stream.clearLine !== "function") {
+            stream.clearLine = () => {};
+        }
+
+        if (typeof stream.cursorTo !== "function") {
+            stream.cursorTo = () => {};
+        }
+    }
+}
 
 const { spawn } = require("child_process");
 const express = require("express");
@@ -58,7 +72,9 @@ function startProject() {
 
 // Uptime Server
 app.get("/", (req, res) => {
-    res.status(200).send("SIYAM HASAN Messenger GoatBot is running!");
+    res.status(200).send(
+        "SIYAM HASAN Messenger GoatBot is running!"
+    );
 });
 
 // Health Check
