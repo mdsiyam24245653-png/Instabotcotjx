@@ -1,48 +1,62 @@
+
 /**
  * @author NTKhang
- * ! The source code is written by NTKhang, please don't change the author's name everywhere. Thank you for using
- * ! Official source code: https://github.com/ntkhang03/Goat-Bot-V2
- * ! If you do not download the source code from the above address, you are using an unknown version and at risk of having your account hacked
- *
- * English:
- * ! Please do not change the below code, it is very important for the project.
- * It is my motivation to maintain and develop the project for free.
- * ! If you change it, you will be banned forever
- * Thank you for using
- *
- * Vietnamese:
- * ! Vui lòng không thay đổi mã bên dưới, nó rất quan trọng đối với dự án.
- * Nó là động lực để tôi duy trì và phát triển dự án miễn phí.
- * ! Nếu thay đổi nó, bạn sẽ bị cấm vĩnh viễn
- * Cảm ơn bạn đã sử dụng
+ * Official source: https://github.com/ntkhang03/Goat-Bot-V2
  */
 
 const { spawn } = require("child_process");
+const express = require("express");
 const log = require("./logger/log.js");
 
-function startProject() {
-	const child = spawn("node", ["Goat.js"], {
-		cwd: __dirname,
-		stdio: "inherit",
-		shell: true
-	});
+const app = express();
+const PORT = process.env.PORT || 10000;
 
-	child.on("close", (code) => {
-		if (code == 2) {
-			log.info("Restarting Project...");
-			startProject();
-		}
-	});
+let child;
+let restarting = false;
+
+function startProject() {
+  log.info("Starting GoatBot...");
+
+  child = spawn("node", ["Goat.js"], {
+    cwd: __dirname,
+    stdio: "inherit",
+    shell: false
+  });
+
+  child.on("error", (error) => {
+    log.error("Bot startup error: " + error.message);
+    process.exit(1);
+  });
+
+  child.on("close", (code) => {
+    log.info("Bot process stopped with code: " + code);
+
+    if (code === 2 && !restarting) {
+      restarting = true;
+      log.info("Restarting Project...");
+
+      setTimeout(() => {
+        restarting = false;
+        startProject();
+      }, 3000);
+    } else {
+      process.exit(code || 0);
+    }
+  });
 }
 
-startProject();
-const express = require('express');
-const app = express();
-
-app.get('/', (req, res) => {
-  res.send('Bot is running!');
+app.get("/", (req, res) => {
+  res.status(200).send("Bot is running!");
 });
 
-app.listen(3000, () => {
-  console.log('Uptime server running on port 3000');
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    uptime: process.uptime()
+  });
+});
+
+app.listen(PORT, "0.0.0.0", () => {
+  log.info("Uptime server running on port " + PORT);
+  startProject();
 });
