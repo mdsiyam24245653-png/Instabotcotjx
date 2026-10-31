@@ -5,7 +5,7 @@
   "description": "GoatBot Messenger Automation",
   "main": "index.js",
   "engines": {
-    "node": "18.x",
+    "node": ">=20.0.0",
     "npm": ">=7.0.0"
   },
   "scripts": {
@@ -59,6 +59,6 @@
     "websocket-stream": "^5.5.2",
     "ws3-fca": "^1.0.0"
   },
-  "author": "NTKhang",
+  "author": "siyam",
   "license": "MIT"
 }
