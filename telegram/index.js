@@ -1,31 +1,47 @@
+File: "telegram/index.js"
+
+/**
+ * GoatBot Messenger + Telegram Integration
+ * Telegram Module
+ *
+ * Author: Project Maintainer
+ * Version: 1.0.0
+ * License: MIT
+ *
+ * Messenger configuration is read-only.
+ * Telegram token is loaded from telegram/config.json.
+ */
 
 const fs = require("fs");
 const path = require("path");
 const axios = require("axios");
+
 const { loadCommands } = require("./handlers/commandHandler");
 const { dispatchUpdate } = require("./handlers/eventHandler");
 const { logTelegramError } = require("./handlers/errorHandler");
 
-const configPath = path.join(__dirname, "config.json");
+const telegramConfigPath = path.join(__dirname, "config.json");
+const messengerConfigPath = path.join(__dirname, "..", "config.json");
+
+function readJSON(filePath) {
+  return JSON.parse(fs.readFileSync(filePath, "utf8"));
+}
 
 function loadConfig() {
-  const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
+  const telegramConfig = readJSON(telegramConfigPath);
+  const messengerConfig = readJSON(messengerConfigPath);
 
-  // Keep Telegram permissions separate from Messenger Facebook UIDs.
-  const ownerIds = (process.env.TELEGRAM_OWNER_IDS || "")
-    .split(",").map((id) => id.trim()).filter(Boolean);
-  const adminIds = (process.env.TELEGRAM_ADMIN_IDS || "")
-    .split(",").map((id) => id.trim()).filter(Boolean);
+  // Messenger configuration remains unchanged.
+  // Facebook UIDs and Telegram UIDs are different identifiers.
+  telegramConfig.messengerPermissionSource = {
+    adminBot: messengerConfig.adminBot || [],
+    ownerUID: messengerConfig.security?.ownerUID || "",
+    whitelistEnabled: Boolean(messengerConfig.whiteListMode?.enable),
+    whitelistIds: messengerConfig.whiteListMode?.whiteListIds || [],
+    adminOnlyEnabled: Boolean(messengerConfig.adminOnly?.enable)
+  };
 
-  if (ownerIds.length) config.owner.ids = ownerIds;
-  if (adminIds.length) config.admins = adminIds;
-
-  // Telegram accepts the Messenger-style prefix; slash commands remain supported too.
-  if (process.env.TELEGRAM_PREFIX) {
-    config.prefix = process.env.TELEGRAM_PREFIX;
-  }
-
-  return config;
+  return telegramConfig;
 }
 
 function createApi(token) {
@@ -38,7 +54,8 @@ function createApi(token) {
 
     if (!response.data?.ok) {
       throw new Error(
-        response.data?.description || `Telegram API ${method} failed`
+        response.data?.description ||
+        `Telegram API ${method} failed`
       );
     }
 
@@ -77,29 +94,29 @@ function createApi(token) {
   };
 }
 
-async function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 module.exports = async function startTelegram() {
   const config = loadConfig();
 
   if (!config.enabled) {
-    console.log("[TELEGRAM] Disabled in telegram/config.json");
+    console.log("[TELEGRAM] Disabled.");
     return;
   }
 
-  const tokenName = config.botTokenEnv || "TELEGRAM_BOT_TOKEN";
-  const token = process.env[tokenName];
+  const token = config.botToken;
 
-  if (!token) {
-    console.warn(
-      `[TELEGRAM] Not started: set the ${tokenName} environment variable.`
+  if (!token || typeof token !== "string") {
+    console.error(
+      "[TELEGRAM] Bot token missing in telegram/config.json"
     );
     return;
   }
 
   const api = createApi(token);
+
   const botInfo = await api.getMe();
 
   loadCommands();
@@ -107,6 +124,7 @@ module.exports = async function startTelegram() {
   console.log(
     `[TELEGRAM] Connected as @${botInfo.username || botInfo.id}`
   );
+
   console.log("[TELEGRAM] Long polling started.");
 
   let offset = 0;
@@ -137,24 +155,29 @@ module.exports = async function startTelegram() {
             botInfo
           });
         } catch (error) {
-          logTelegramError(`update ${update.update_id}`, error);
+          logTelegramError(
+            `update ${update.update_id}`,
+            error
+          );
         }
       }
     } catch (error) {
       logTelegramError("polling", error);
 
       if (error.response?.status === 401) {
-        console.error("[TELEGRAM] Invalid token. Polling stopped.");
+        console.error("[TELEGRAM] Invalid bot token.");
         break;
       }
 
       if (error.response?.status === 409) {
         console.error(
-          "[TELEGRAM] Another polling session is using this token. Check other deployments."
+          "[TELEGRAM] Another polling session is using this token."
         );
       }
 
-      await sleep(Number(config.polling?.retryDelayMs) || 4000);
+      await sleep(
+        Number(config.polling?.retryDelayMs) || 4000
+      );
     }
   }
 
@@ -163,4 +186,3 @@ module.exports = async function startTelegram() {
 
   console.log("[TELEGRAM] Polling stopped.");
 };
-    
