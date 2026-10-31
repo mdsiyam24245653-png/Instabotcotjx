@@ -1,0 +1,35 @@
+
+{
+  "enabled": true,
+  "botTokenEnv": "TELEGRAM_BOT_TOKEN",
+  "prefix": ",",
+  "owner": {
+    "ids": []
+  },
+  "admins": [],
+  "whitelist": {
+    "enabled": false,
+    "ids": []
+  },
+  "adminOnly": {
+    "enabled": false,
+    "ignoreCommands": [
+      "start",
+      "help",
+      "ping",
+      "id"
+    ]
+  },
+  "permissions": {
+    "allowGroups": true,
+    "allowPrivate": true,
+    "allowOnlyGroupAdminsForModeration": true
+  },
+  "security": {
+    "blockBots": true
+  },
+  "polling": {
+    "timeout": 30,
+    "retryDelayMs": 4000
+  }
+}
