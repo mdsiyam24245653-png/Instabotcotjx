@@ -1,25 +1,12 @@
-
 /**
- * @author siyam
- * SIYAM HASAN - Messenger GoatBot Launcher
- * Facebook Messenger Only
- *
- * Original source:
- * https://github.com/ntkhang03/Goat-Bot-V2
- */
 
-// Terminal compatibility fix
-for (const stream of [process.stdout, process.stderr]) {
-    if (stream) {
-        if (typeof stream.clearLine !== "function") {
-            stream.clearLine = () => {};
-        }
-
-        if (typeof stream.cursorTo !== "function") {
-            stream.cursorTo = () => {};
-        }
-    }
-}
+- @author siyam
+- SIYAM HASAN - Messenger GoatBot Launcher
+- Facebook Messenger Only
+- 
+- Original source:
+- https://github.com/ntkhang03/Goat-Bot-V2
+  */
 
 const { spawn } = require("child_process");
 const express = require("express");
@@ -34,83 +21,83 @@ let shuttingDown = false;
 
 // Start Messenger GoatBot
 function startProject() {
-    if (shuttingDown) return;
+if (shuttingDown) return;
 
-    log.info("MESSENGER", "Starting GoatBot...");
+log.info("MESSENGER", "Starting GoatBot...");  
 
-    child = spawn(process.execPath, ["Goat.js"], {
-        cwd: __dirname,
-        stdio: "inherit",
-        shell: false,
-        env: process.env
-    });
+child = spawn(process.execPath, ["Goat.js"], {  
+    cwd: __dirname,  
+    stdio: "inherit",  
+    shell: false,  
+    env: process.env  
+});  
 
-    child.on("error", (error) => {
-        log.error("MESSENGER", "Startup error: " + error.message);
-        process.exitCode = 1;
-    });
+child.on("error", (error) => {  
+    log.error("MESSENGER", "Startup error: " + error.message);  
+    process.exitCode = 1;  
+});  
 
-    child.on("close", (code) => {
-        log.info("MESSENGER", "Bot stopped with code: " + code);
+child.on("close", (code) => {  
+    log.info("MESSENGER", "Bot stopped with code: " + code);  
 
-        if (shuttingDown) return;
+    if (shuttingDown) return;  
 
-        if (code === 2 && !restarting) {
-            restarting = true;
+    if (code === 2 && !restarting) {  
+        restarting = true;  
 
-            log.info("MESSENGER", "Restarting GoatBot...");
+        log.info("MESSENGER", "Restarting GoatBot...");  
 
-            setTimeout(() => {
-                restarting = false;
-                startProject();
-            }, 3000);
-        } else {
-            process.exit(code || 0);
-        }
-    });
+        setTimeout(() => {  
+            restarting = false;  
+            startProject();  
+        }, 3000);  
+    } else {  
+        process.exit(code || 0);  
+    }  
+});
+
 }
 
 // Uptime Server
 app.get("/", (req, res) => {
-    res.status(200).send(
-        "SIYAM HASAN Messenger GoatBot is running!"
-    );
+res.status(200).send("SIYAM HASAN Messenger GoatBot is running!");
 });
 
 // Health Check
 app.get("/health", (req, res) => {
-    res.status(200).json({
-        status: "OK",
-        platform: "Facebook Messenger",
-        uptime: process.uptime(),
-        messenger:
-            child && child.exitCode === null
-                ? "running"
-                : "starting"
-    });
+res.status(200).json({
+status: "OK",
+platform: "Facebook Messenger",
+uptime: process.uptime(),
+messenger:
+child && child.exitCode === null
+? "running"
+: "starting"
+});
 });
 
 // Start Server
 const server = app.listen(PORT, "0.0.0.0", () => {
-    log.info("SERVER", "Uptime server running on port " + PORT);
-    startProject();
+log.info("SERVER", "Uptime server running on port " + PORT);
+startProject();
 });
 
 // Graceful shutdown
 function shutdown() {
-    if (shuttingDown) return;
+if (shuttingDown) return;
 
-    shuttingDown = true;
+shuttingDown = true;  
 
-    if (child && child.exitCode === null) {
-        child.kill("SIGTERM");
-    }
+if (child && child.exitCode === null) {  
+    child.kill("SIGTERM");  
+}  
 
-    server.close(() => {
-        process.exit(0);
-    });
+server.close(() => {  
+    process.exit(0);  
+});  
 
-    setTimeout(() => process.exit(0), 5000).unref();
+setTimeout(() => process.exit(0), 5000).unref();
+
 }
 
 process.on("SIGINT", shutdown);
