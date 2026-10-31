@@ -1,15 +1,14 @@
-File: "telegram/index.js"
-
 /**
  * GoatBot Messenger + Telegram Integration
  * Telegram Module
  *
  * Author: Project Maintainer
- * Version: 1.0.0
+ * Version: 1.0.1
  * License: MIT
  *
  * Messenger configuration is read-only.
- * Telegram token is loaded from telegram/config.json.
+ * Telegram token is loaded directly from
+ * telegram/config.json -> botTokenEnv.
  */
 
 const fs = require("fs");
@@ -24,22 +23,38 @@ const telegramConfigPath = path.join(__dirname, "config.json");
 const messengerConfigPath = path.join(__dirname, "..", "config.json");
 
 function readJSON(filePath) {
-  return JSON.parse(fs.readFileSync(filePath, "utf8"));
+  try {
+    return JSON.parse(fs.readFileSync(filePath, "utf8"));
+  } catch (error) {
+    throw new Error(
+      `Cannot read ${path.basename(filePath)}: ${error.message}`
+    );
+  }
 }
 
 function loadConfig() {
   const telegramConfig = readJSON(telegramConfigPath);
-  const messengerConfig = readJSON(messengerConfigPath);
 
-  // Messenger configuration remains unchanged.
-  // Facebook UIDs and Telegram UIDs are different identifiers.
-  telegramConfig.messengerPermissionSource = {
-    adminBot: messengerConfig.adminBot || [],
-    ownerUID: messengerConfig.security?.ownerUID || "",
-    whitelistEnabled: Boolean(messengerConfig.whiteListMode?.enable),
-    whitelistIds: messengerConfig.whiteListMode?.whiteListIds || [],
-    adminOnlyEnabled: Boolean(messengerConfig.adminOnly?.enable)
-  };
+  // Messenger configuration is read-only.
+  // Facebook UIDs are not Telegram UIDs.
+  try {
+    const messengerConfig = readJSON(messengerConfigPath);
+
+    telegramConfig.messengerPermissionSource = {
+      adminBot: messengerConfig.adminBot || [],
+      ownerUID: messengerConfig.security?.ownerUID || "",
+      whitelistEnabled: Boolean(
+        messengerConfig.whiteListMode?.enable
+      ),
+      whitelistIds:
+        messengerConfig.whiteListMode?.whiteListIds || [],
+      adminOnlyEnabled: Boolean(
+        messengerConfig.adminOnly?.enable
+      )
+    };
+  } catch (error) {
+    console.error("[TELEGRAM] Messenger config read warning:", error.message);
+  }
 
   return telegramConfig;
 }
@@ -64,7 +79,9 @@ function createApi(token) {
 
   return {
     getMe: () => call("getMe"),
-    getUpdates: (params) => call("getUpdates", params),
+
+    getUpdates: (params) =>
+      call("getUpdates", params),
 
     sendMessage: (chatId, text, options = {}) =>
       call("sendMessage", {
@@ -99,27 +116,57 @@ function sleep(ms) {
 }
 
 module.exports = async function startTelegram() {
-  const config = loadConfig();
+  let config;
+
+  try {
+    config = loadConfig();
+  } catch (error) {
+    console.error("[TELEGRAM] Configuration error:", error.message);
+    return;
+  }
 
   if (!config.enabled) {
     console.log("[TELEGRAM] Disabled.");
     return;
   }
 
-  const token = config.botToken;
+  // Read the token directly from botTokenEnv.
+  // No Render environment variable is required.
+  const token = config.botTokenEnv;
 
-  if (!token || typeof token !== "string") {
+  if (
+    !token ||
+    typeof token !== "string" ||
+    !token.trim()
+  ) {
     console.error(
-      "[TELEGRAM] Bot token missing in telegram/config.json"
+      "[TELEGRAM] Bot token missing in telegram/config.json (botTokenEnv)."
     );
     return;
   }
 
-  const api = createApi(token);
+  const api = createApi(token.trim());
 
-  const botInfo = await api.getMe();
+  let botInfo;
 
-  loadCommands();
+  try {
+    botInfo = await api.getMe();
+  } catch (error) {
+    logTelegramError("bot connection", error);
+
+    if (error.response?.status === 401) {
+      console.error("[TELEGRAM] Invalid bot token.");
+    }
+
+    return;
+  }
+
+  try {
+    loadCommands();
+  } catch (error) {
+    console.error("[TELEGRAM] Command loading failed:", error.message);
+    return;
+  }
 
   console.log(
     `[TELEGRAM] Connected as @${botInfo.username || botInfo.id}`
