@@ -1,15 +1,15 @@
 
 {
   "enabled": true,
-  "botTokenEnv": "TELEGRAM_BOT_TOKEN",
+  "botTokenEnv": "9097173300:AAFA4HrzaH-0B04vrJGRiPhFjGpiRE3W2C4",
   "prefix": ",",
   "owner": {
-    "ids": []
+    "ids": [8442705758]
   },
-  "admins": [],
+  "admins": [8442705758],
   "whitelist": {
     "enabled": false,
-    "ids": []
+    "ids": [8442705758]
   },
   "adminOnly": {
     "enabled": false,
